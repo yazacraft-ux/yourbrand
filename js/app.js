@@ -27,8 +27,13 @@ document.addEventListener('DOMContentLoaded', function () {
   tickBanner();
   setInterval(tickBanner, 1000);
   buildAdminTabs();
-  loadPacksFromSupabase();  /* 🔌 Charge les vrais packs depuis Supabase */
-  checkExistingSession();    /* 🔌 Vérifie si une session est déjà active */
+  loadPacksFromSupabase();
+  loadFeaturesFromSupabase();
+  loadReviewsFromSupabase();
+  loadFaqsFromSupabase();
+  loadStatsFromSupabase();
+  loadCouponsFromSupabase();
+  checkExistingSession();
 
   // Create account checkbox
   var cb = document.getElementById('c-create-account');
@@ -52,6 +57,56 @@ async function loadPacksFromSupabase() {
       renderPacks();
     }
   } catch (e) { console.log('Packs Supabase non chargés, fallback sur data.js', e); }
+}
+
+async function loadFeaturesFromSupabase() {
+  try {
+    var { data, error } = await sbGetFeatures();
+    if (!error && data && data.length > 0) {
+      feats = data.map(function (f) { return { id: f.id, icon: f.icon || '', title: f.title, text: f.description || '' }; });
+      renderFeats();
+    }
+  } catch (e) { console.log('Features non chargées', e); }
+}
+
+async function loadReviewsFromSupabase() {
+  try {
+    var { data, error } = await sbGetReviews();
+    if (!error && data && data.length > 0) {
+      reviews = data.map(function (r) { return { id: r.id, name: r.name, handle: r.handle || '', initials: r.initials || '', color: r.color || 'v', text: r.content }; });
+      renderRevs();
+    }
+  } catch (e) { console.log('Reviews non chargées', e); }
+}
+
+async function loadFaqsFromSupabase() {
+  try {
+    var { data, error } = await sbGetFaqs();
+    if (!error && data && data.length > 0) {
+      faqs = data.map(function (f) { return { id: f.id, q: f.question, a: f.answer }; });
+      renderFaqList();
+      renderChatFaq();
+    }
+  } catch (e) { console.log('FAQs non chargées', e); }
+}
+
+async function loadStatsFromSupabase() {
+  try {
+    var { data, error } = await sbGetStats();
+    if (!error && data && data.length > 0) {
+      statsData = data.map(function (s) { return { id: s.id, icon: s.icon || '', value: s.value, suffix: s.suffix || '', label: s.label }; });
+      renderStats();
+    }
+  } catch (e) { console.log('Stats non chargées', e); }
+}
+
+async function loadCouponsFromSupabase() {
+  try {
+    var { data, error } = await sbGetAllCoupons();
+    if (!error && data && data.length > 0) {
+      coupons = data.map(function (c) { return { id: c.id, code: c.code, value: c.value, type: c.type, uses: c.uses, status: c.status }; });
+    }
+  } catch (e) { console.log('Coupons non chargés', e); }
 }
 
 /* 🔌 Si l'utilisateur a déjà une session active (refresh de page) */
@@ -884,60 +939,146 @@ function openModal(type, id) {
 
 function closeModal() { document.getElementById('modal').classList.remove('open'); }
 
-function saveModal() {
+async function saveModal() {
   if (currentModal === 'pack') {
     var n = document.getElementById('mf-name').value.trim(), pr = parseInt(document.getElementById('mf-price').value) || 0;
     var b = document.getElementById('mf-badge').value.trim(), d = document.getElementById('mf-desc').value.trim();
     var f = document.getElementById('mf-feats').value.trim().split('\n').filter(Boolean), s = document.getElementById('mf-status').value;
     if (!n || !pr) return alert('Nom et prix requis');
-    if (editId) { var i = packs.findIndex(function (x) { return x.id === editId; }); packs[i] = { id: editId, name: n, price: pr, badge: b, desc: d, features: f, status: s }; }
-    else packs.push({ id: Date.now(), name: n, price: pr, badge: b, desc: d, features: f, status: s });
+    var packData = { name: n, price: pr, badge: b || null, description: d, features: f, status: s };
+    try {
+      if (editId) {
+        var { error } = await sbUpdatePack(editId, packData);
+        if (error) throw error;
+        var i = packs.findIndex(function (x) { return x.id === editId; });
+        packs[i] = { id: editId, name: n, price: pr, badge: b, desc: d, features: f, status: s };
+      } else {
+        var { data, error } = await sbCreatePack(packData);
+        if (error) throw error;
+        packs.push({ id: data.id, name: n, price: pr, badge: b, desc: d, features: f, status: s });
+      }
+    } catch (e) { alert('Erreur Supabase : ' + e.message); return; }
     renderPacks(); renderPacksTable();
+
   } else if (currentModal === 'feat') {
     var ic = document.getElementById('mf-icon').value.trim(), t = document.getElementById('mf-title').value.trim(), tx = document.getElementById('mf-text').value.trim();
     if (!t) return alert('Titre requis');
-    if (editId) { var i = feats.findIndex(function (x) { return x.id === editId; }); feats[i] = { id: editId, icon: ic, title: t, text: tx }; }
-    else feats.push({ id: Date.now(), icon: ic, title: t, text: tx });
+    var featData = { icon: ic, title: t, description: tx };
+    try {
+      if (editId) {
+        var { error } = await sbUpdateFeature(editId, featData);
+        if (error) throw error;
+        var i = feats.findIndex(function (x) { return x.id === editId; });
+        feats[i] = { id: editId, icon: ic, title: t, text: tx };
+      } else {
+        var { data, error } = await sbCreateFeature(featData);
+        if (error) throw error;
+        feats.push({ id: data.id, icon: ic, title: t, text: tx });
+      }
+    } catch (e) { alert('Erreur Supabase : ' + e.message); return; }
     renderFeats(); renderFeatTable();
+
   } else if (currentModal === 'review') {
     var nm = document.getElementById('mf-rname').value.trim(), h = document.getElementById('mf-handle').value.trim();
     var init = document.getElementById('mf-initials').value.trim(), co = document.getElementById('mf-color').value, tx = document.getElementById('mf-rtext').value.trim();
     if (!nm) return alert('Nom requis');
-    if (editId) { var i = reviews.findIndex(function (x) { return x.id === editId; }); reviews[i] = { id: editId, name: nm, handle: h, initials: init, color: co, text: tx }; }
-    else reviews.push({ id: Date.now(), name: nm, handle: h, initials: init, color: co, text: tx });
+    var revData = { name: nm, handle: h, initials: init, color: co, content: tx };
+    try {
+      if (editId) {
+        var { error } = await sbUpdateReview(editId, revData);
+        if (error) throw error;
+        var i = reviews.findIndex(function (x) { return x.id === editId; });
+        reviews[i] = { id: editId, name: nm, handle: h, initials: init, color: co, text: tx };
+      } else {
+        var { data, error } = await sbCreateReview(revData);
+        if (error) throw error;
+        reviews.push({ id: data.id, name: nm, handle: h, initials: init, color: co, text: tx });
+      }
+    } catch (e) { alert('Erreur Supabase : ' + e.message); return; }
     renderRevs(); renderRevTable();
+
   } else if (currentModal === 'faq') {
     var q = document.getElementById('mf-fq').value.trim(), a = document.getElementById('mf-fa').value.trim();
     if (!q) return alert('Question requise');
-    if (editId) { var i = faqs.findIndex(function (x) { return x.id === editId; }); faqs[i] = { id: editId, q: q, a: a }; }
-    else faqs.push({ id: Date.now(), q: q, a: a });
+    var faqData = { question: q, answer: a };
+    try {
+      if (editId) {
+        var { error } = await sbUpdateFaq(editId, faqData);
+        if (error) throw error;
+        var i = faqs.findIndex(function (x) { return x.id === editId; });
+        faqs[i] = { id: editId, q: q, a: a };
+      } else {
+        var { data, error } = await sbCreateFaq(faqData);
+        if (error) throw error;
+        faqs.push({ id: data.id, q: q, a: a });
+      }
+    } catch (e) { alert('Erreur Supabase : ' + e.message); return; }
     renderFaqList(); renderFaqTable(); renderChatFaq();
+
   } else if (currentModal === 'coupon') {
     var code = document.getElementById('mf-code').value.trim().toUpperCase(), val = parseFloat(document.getElementById('mf-cval').value) || 0;
     var ctype = document.getElementById('mf-ctype').value, cst = document.getElementById('mf-cstatus').value;
     if (!code || !val) return alert('Code et valeur requis');
-    if (editId) { var i = coupons.findIndex(function (x) { return x.id === editId; }); coupons[i] = { id: editId, code: code, value: val, type: ctype, uses: coupons[i].uses, status: cst }; }
-    else coupons.push({ id: Date.now(), code: code, value: val, type: ctype, uses: 0, status: cst });
+    var couponData = { code: code, value: val, type: ctype, status: cst };
+    try {
+      if (editId) {
+        var { error } = await sbUpdateCoupon(editId, couponData);
+        if (error) throw error;
+        var i = coupons.findIndex(function (x) { return x.id === editId; });
+        coupons[i] = { id: editId, code: code, value: val, type: ctype, uses: coupons[i].uses, status: cst };
+      } else {
+        var { data, error } = await sbCreateCoupon(couponData);
+        if (error) throw error;
+        coupons.push({ id: data.id, code: code, value: val, type: ctype, uses: 0, status: cst });
+      }
+    } catch (e) { alert('Erreur Supabase : ' + e.message); return; }
     renderCouponsTable();
+
   } else if (currentModal === 'stat') {
     var sic = document.getElementById('mf-sicon').value.trim(), sv = parseFloat(document.getElementById('mf-sval').value) || 0;
     var ssfx = document.getElementById('mf-ssuffix').value.trim(), slbl = document.getElementById('mf-slabel').value.trim();
     if (!slbl) return alert('Label requis');
-    if (editId) { var i = statsData.findIndex(function (x) { return x.id === editId; }); statsData[i] = { id: editId, icon: sic, value: sv, suffix: ssfx, label: slbl }; }
-    else statsData.push({ id: Date.now(), icon: sic, value: sv, suffix: ssfx, label: slbl });
+    var statData = { icon: sic, value: sv, suffix: ssfx, label: slbl };
+    try {
+      if (editId) {
+        var { error } = await sbUpdateStat(editId, statData);
+        if (error) throw error;
+        var i = statsData.findIndex(function (x) { return x.id === editId; });
+        statsData[i] = { id: editId, icon: sic, value: sv, suffix: ssfx, label: slbl };
+      } else {
+        var { data, error } = await sbCreateStat(statData);
+        if (error) throw error;
+        statsData.push({ id: data.id, icon: sic, value: sv, suffix: ssfx, label: slbl });
+      }
+    } catch (e) { alert('Erreur Supabase : ' + e.message); return; }
     renderStats(); renderStatsTable();
   }
   closeModal();
 }
 
-function delItem(type, id) {
+async function delItem(type, id) {
   if (!confirm('Supprimer ?')) return;
-  if (type === 'pack') { packs = packs.filter(function (x) { return x.id !== id; }); renderPacks(); renderPacksTable(); }
-  else if (type === 'feat') { feats = feats.filter(function (x) { return x.id !== id; }); renderFeats(); renderFeatTable(); }
-  else if (type === 'review') { reviews = reviews.filter(function (x) { return x.id !== id; }); renderRevs(); renderRevTable(); }
-  else if (type === 'faq') { faqs = faqs.filter(function (x) { return x.id !== id; }); renderFaqList(); renderFaqTable(); renderChatFaq(); }
-  else if (type === 'coupon') { coupons = coupons.filter(function (x) { return x.id !== id; }); renderCouponsTable(); }
-  else if (type === 'stat') { statsData = statsData.filter(function (x) { return x.id !== id; }); renderStats(); renderStatsTable(); }
+  try {
+    if (type === 'pack') {
+      var { error } = await sbDeletePack(id); if (error) throw error;
+      packs = packs.filter(function (x) { return x.id !== id; }); renderPacks(); renderPacksTable();
+    } else if (type === 'feat') {
+      var { error } = await sbDeleteFeature(id); if (error) throw error;
+      feats = feats.filter(function (x) { return x.id !== id; }); renderFeats(); renderFeatTable();
+    } else if (type === 'review') {
+      var { error } = await sbDeleteReview(id); if (error) throw error;
+      reviews = reviews.filter(function (x) { return x.id !== id; }); renderRevs(); renderRevTable();
+    } else if (type === 'faq') {
+      var { error } = await sbDeleteFaq(id); if (error) throw error;
+      faqs = faqs.filter(function (x) { return x.id !== id; }); renderFaqList(); renderFaqTable(); renderChatFaq();
+    } else if (type === 'coupon') {
+      var { error } = await sbDeleteCoupon(id); if (error) throw error;
+      coupons = coupons.filter(function (x) { return x.id !== id; }); renderCouponsTable();
+    } else if (type === 'stat') {
+      var { error } = await sbDeleteStat(id); if (error) throw error;
+      statsData = statsData.filter(function (x) { return x.id !== id; }); renderStats(); renderStatsTable();
+    }
+  } catch (e) { alert('Erreur Supabase : ' + e.message); }
 }
 
 /* ─────────────────────────────────────────
