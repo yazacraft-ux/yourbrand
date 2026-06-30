@@ -13,6 +13,8 @@ var epTimer = null;
 var epSeconds = 0;
 var activeConvId = null;
 var cdTotal = 2 * 3600 + 47 * 60 + 33;
+var currentUser = null;      /* 🔌 Utilisateur Supabase connecté */
+var currentProfile = null;   /* 🔌 Profil (rôle, statut) */
 
 /* ─────────────────────────────────────────
    INIT
@@ -25,6 +27,8 @@ document.addEventListener('DOMContentLoaded', function () {
   tickBanner();
   setInterval(tickBanner, 1000);
   buildAdminTabs();
+  loadPacksFromSupabase();  /* 🔌 Charge les vrais packs depuis Supabase */
+  checkExistingSession();    /* 🔌 Vérifie si une session est déjà active */
 
   // Create account checkbox
   var cb = document.getElementById('c-create-account');
@@ -36,6 +40,29 @@ document.addEventListener('DOMContentLoaded', function () {
   renderMentions();
   renderCGV();
 });
+
+/* 🔌 Charge les packs depuis Supabase (fallback sur data.js si vide/erreur) */
+async function loadPacksFromSupabase() {
+  try {
+    var { data, error } = await sbGetPacks();
+    if (!error && data && data.length > 0) {
+      packs = data.map(function (p) {
+        return { id: p.id, name: p.name, price: p.price, badge: p.badge || '', desc: p.description || '', features: p.features || [], status: p.status };
+      });
+      renderPacks();
+    }
+  } catch (e) { console.log('Packs Supabase non chargés, fallback sur data.js', e); }
+}
+
+/* 🔌 Si l'utilisateur a déjà une session active (refresh de page) */
+async function checkExistingSession() {
+  var user = await sbGetCurrentUser();
+  if (user) {
+    currentUser = user;
+    var { data: profile } = await sbGetProfile(user.id);
+    currentProfile = profile;
+  }
+}
 
 /* ─────────────────────────────────────────
    COUNTDOWN BANDEAU
@@ -60,6 +87,70 @@ function tickBanner() {
     document.getElementById('ep-m').textContent = String(EP.cdMin).padStart(2, '0');
     document.getElementById('ep-s').textContent = '00';
   }
+}
+
+/* ─────────────────────────────────────────
+   🔌 CHARGEMENT DONNÉES RÉELLES SUPABASE
+───────────────────────────────────────── */
+
+async function loadMyOrders() {
+  if (!currentUser) return;
+  try {
+    var { data } = await sbGetMyOrders(currentUser.id);
+    var tbody = document.querySelector('#mtab-orders table tbody');
+    if (!tbody) return;
+    if (data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="color:var(--muted);text-align:center;padding:20px">Aucune commande pour le moment</td></tr>';
+      return;
+    }
+    tbody.innerHTML = data.map(function (o) {
+      var packName = o.packs ? o.packs.name : '—';
+      var dateStr = new Date(o.created_at).toLocaleDateString('fr-FR');
+      var statusBadge = o.status === 'paid' ? '<span class="bs ba">✓ Livré</span>' : o.status === 'refunded' ? '<span class="bs br">Remboursé</span>' : '<span class="bs bd">En attente</span>';
+      return '<tr><td class="order-num">#' + o.id.substring(0, 8) + '</td><td>' + packName + '</td><td class="fw7">' + o.amount + '€</td><td>' + statusBadge + '</td><td class="muted">' + dateStr + '</td></tr>';
+    }).join('');
+  } catch (e) { console.log('Erreur chargement commandes', e); }
+}
+
+async function loadAllOrdersAdmin() {
+  try {
+    var { data } = await sbGetAllOrders();
+    var tbody = document.querySelector('#atab-orders table tbody');
+    if (!tbody || !data) return;
+    if (data.length === 0) return; // garde les données demo si vide
+    tbody.innerHTML = data.map(function (o) {
+      var packName = o.packs ? o.packs.name : '—';
+      var clientName = o.profiles ? o.profiles.full_name : o.full_name;
+      var statusBadge = o.status === 'paid' ? '<span class="bs ba">✓</span>' : o.status === 'refunded' ? '<span class="bs br">Remb.</span>' : '<span class="bs bd">Attente</span>';
+      return '<tr><td class="order-num">#' + o.id.substring(0, 8) + '</td><td>' + clientName + '</td><td>' + packName + '</td><td class="muted">' + (o.order_bump ? 'Oui' : '—') + '</td><td class="fw7">' + o.amount + '€</td><td>' + statusBadge + '</td></tr>';
+    }).join('');
+  } catch (e) { console.log('Erreur chargement commandes admin', e); }
+}
+
+async function loadAllMembresAdmin() {
+  try {
+    var { data } = await sbGetAllProfiles();
+    if (data && data.length > 0) {
+      membres = data.map(function (p) {
+        return { id: p.id, name: p.full_name || p.email, email: p.email, pack: '—', date: new Date(p.created_at).toLocaleDateString('fr-FR'), status: p.status };
+      });
+    }
+  } catch (e) { console.log('Erreur chargement membres', e); }
+}
+
+async function loadMyMessages() {
+  if (!currentUser) return;
+  try {
+    var { data } = await sbGetMyMessages(currentUser.id);
+    if (data && data.length > 0) {
+      var conv = conversations.find(function (c) { return c.userId === currentUser.id; });
+      if (!conv) {
+        conv = { id: currentUser.id, userId: currentUser.id, membre: currentProfile ? currentProfile.full_name : 'Toi', initials: 'M', pack: '—', read: true, messages: [] };
+        conversations.push(conv);
+      }
+      conv.messages = data.map(function (m) { return { from: m.sender, text: m.content, time: new Date(m.created_at).toLocaleString('fr-FR') }; });
+    }
+  } catch (e) { console.log('Erreur chargement messages', e); }
 }
 
 /* ─────────────────────────────────────────
@@ -101,29 +192,54 @@ function switchLTab(t) {
   document.getElementById('lf-admin').classList.toggle('active', t === 'admin');
 }
 
-function loginMembre() {
-  /* 🔌 SUPABASE : supabase.auth.signInWithPassword({ email, password }) */
+async function loginMembre() {
+  var email = document.getElementById('m-email').value.trim();
   var pass = document.getElementById('m-pass').value;
-  if (pass === S.membrePass) {
-    closeLogin();
-    showView('membre');
-    updateMsgBadges();
-  } else {
-    alert('Mot de passe incorrect');
+  if (!email || !pass) { alert('Remplis email et mot de passe'); return; }
+  var { data, error } = await sbSignIn(email, pass);
+  if (error) { alert('Erreur : ' + error.message); return; }
+  currentUser = data.user;
+  var { data: profile } = await sbGetProfile(data.user.id);
+  if (profile && profile.status === 'blocked') {
+    alert('Ton compte a été suspendu. Contacte le support.');
+    await sbSignOut();
+    return;
   }
+  currentProfile = profile;
+  closeLogin();
+  showView('membre');
+  loadMyOrders();
+  loadMyMessages();
+  updateMsgBadges();
 }
 
-function loginAdmin() {
-  /* 🔌 SUPABASE : vérifier le rôle admin depuis la table profiles */
+async function loginAdmin() {
+  var email = document.getElementById('a-email').value.trim();
   var pass = document.getElementById('a-pass').value;
-  if (pass === S.adminPass) {
-    closeLogin();
-    showView('admin');
-    renderAll();
-    updateMsgBadges();
-  } else {
-    alert('Mot de passe incorrect');
+  if (!email || !pass) { alert('Remplis email et mot de passe'); return; }
+  var { data, error } = await sbSignIn(email, pass);
+  if (error) { alert('Erreur : ' + error.message); return; }
+  var { data: profile } = await sbGetProfile(data.user.id);
+  if (!profile || profile.role !== 'admin') {
+    alert("Ce compte n'a pas les droits administrateur.");
+    await sbSignOut();
+    return;
   }
+  currentUser = data.user;
+  currentProfile = profile;
+  closeLogin();
+  showView('admin');
+  renderAll();
+  loadAllOrdersAdmin();
+  loadAllMembresAdmin();
+  updateMsgBadges();
+}
+
+async function logoutUser() {
+  await sbSignOut();
+  currentUser = null;
+  currentProfile = null;
+  showView('landing');
 }
 
 /* ─────────────────────────────────────────
@@ -339,9 +455,18 @@ function updateCartTotals() {
   if (st) st.textContent = total + '€';
 }
 
-function applyCoupon() {
+async function applyCoupon() {
   var code = (document.getElementById('coupon-input').value || '').trim().toUpperCase();
-  var c = coupons.find(function (x) { return x.code === code && x.status === 'active'; });
+  if (!code) return;
+
+  // 🔌 Vérifie d'abord côté Supabase, sinon fallback sur les coupons locaux (data.js)
+  var c = null;
+  try {
+    var { data } = await sbCheckCoupon(code);
+    if (data) c = data;
+  } catch (e) { /* fallback */ }
+  if (!c) c = coupons.find(function (x) { return x.code === code && x.status === 'active'; });
+
   if (c) {
     appliedCoupon = c;
     var lbl = c.type === 'percent' ? '-' + c.value + '%' : '-' + c.value + '€';
@@ -349,7 +474,6 @@ function applyCoupon() {
     if (dl) dl.textContent = lbl;
     var co = document.getElementById('coupon-ok');
     if (co) co.style.display = 'block';
-    c.uses++;
     updateCartTotals();
   } else {
     alert('Code invalide ou expiré');
@@ -373,8 +497,8 @@ function detectCard(input) {
   input.value = v.replace(/(.{4})/g, '$1 ').trim().substring(0, 19);
 }
 
-function processCheckout() {
-  /* 🔌 STRIPE : stripe.confirmPayment() ici */
+async function processCheckout() {
+  /* 🔌 STRIPE : remplace ce bloc par stripe.confirmPayment() avant de créer la commande */
   var email = (document.getElementById('c-email').value || '').trim();
   var fname = (document.getElementById('c-fname').value || '').trim();
   if (!email || !fname) { alert('Remplis au moins ton prénom et ton email'); return; }
@@ -385,6 +509,33 @@ function processCheckout() {
     : 0;
   var total = (subtotal - discount).toFixed(2);
   var orderNum = '#' + Math.floor(10000 + Math.random() * 90000);
+
+  var userId = null;
+
+  // Si l'utilisateur a coché "créer un compte"
+  var createAccount = document.getElementById('c-create-account').checked;
+  if (createAccount) {
+    var pass = document.getElementById('c-pass').value;
+    if (!pass || pass.length < 8) { alert('Le mot de passe doit faire au moins 8 caractères'); return; }
+    var { data: signUpData, error: signUpError } = await sbSignUp(email, pass, fname);
+    if (signUpError) { alert('Erreur de création de compte : ' + signUpError.message); return; }
+    if (signUpData.user) userId = signUpData.user.id;
+  }
+
+  // 🔌 Enregistre la commande dans Supabase
+  try {
+    await sbCreateOrder({
+      user_id: userId,
+      pack_id: typeof pack.id === 'string' ? pack.id : null, // null si pack.id vient de data.js (pas un uuid)
+      email: email,
+      full_name: fname,
+      amount: parseFloat(total),
+      coupon_code: appliedCoupon ? appliedCoupon.code : null,
+      order_bump: obChecked,
+      status: 'pending' /* 🔌 passe à 'paid' une fois Stripe confirmé */
+    });
+  } catch (e) { console.log('Commande non enregistrée dans Supabase', e); }
+
   var details = document.getElementById('success-details');
   if (details) {
     details.innerHTML =
