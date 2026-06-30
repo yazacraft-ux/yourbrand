@@ -19,7 +19,7 @@ var currentProfile = null;   /* 🔌 Profil (rôle, statut) */
 /* ─────────────────────────────────────────
    INIT
 ───────────────────────────────────────── */
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
   renderAll();
   initStatsObserver();
   initExitPopup();
@@ -27,13 +27,18 @@ document.addEventListener('DOMContentLoaded', function () {
   tickBanner();
   setInterval(tickBanner, 1000);
   buildAdminTabs();
-  loadPacksFromSupabase();
-  loadFeaturesFromSupabase();
-  loadReviewsFromSupabase();
-  loadFaqsFromSupabase();
-  loadStatsFromSupabase();
-  loadCouponsFromSupabase();
-  checkExistingSession();
+
+  // Charge tout le contenu Supabase avant de vérifier la session,
+  // pour éviter que checkExistingSession() affiche l'admin avec des données obsolètes.
+  await Promise.all([
+    loadPacksFromSupabase(),
+    loadFeaturesFromSupabase(),
+    loadReviewsFromSupabase(),
+    loadFaqsFromSupabase(),
+    loadStatsFromSupabase(),
+    loadCouponsFromSupabase()
+  ]);
+  await checkExistingSession();
 
   // Create account checkbox
   var cb = document.getElementById('c-create-account');
@@ -116,6 +121,20 @@ async function checkExistingSession() {
     currentUser = user;
     var { data: profile } = await sbGetProfile(user.id);
     currentProfile = profile;
+    if (profile && profile.status !== 'blocked') {
+      if (profile.role === 'admin') {
+        showView('admin');
+        renderAll();
+        loadAllOrdersAdmin();
+        loadAllMembresAdmin();
+        updateMsgBadges();
+      } else {
+        showView('membre');
+        loadMyOrders();
+        loadMyMessages();
+        updateMsgBadges();
+      }
+    }
   }
 }
 
