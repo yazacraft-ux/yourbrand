@@ -10,6 +10,28 @@
 </head>
 <body>
 
+<!-- LOADER INITIAL : masque le flash "landing → espace membre" et le flash du nom de marque
+     pendant que la session et les réglages se chargent depuis Supabase -->
+<div id="app-loader">
+  <span id="loader-brand" class="grad">YourBrand</span>
+  <span class="loader-dot"></span>
+</div>
+<script>
+  // S'exécute en tout premier, avant tout le reste : applique immédiatement
+  // le nom de marque mis en cache lors de la dernière visite, pour éviter
+  // tout flash du nom par défaut "YourBrand".
+  (function () {
+    try {
+      var cached = JSON.parse(localStorage.getItem('yb_settings_cache') || 'null');
+      if (cached && cached.S && cached.S.brand) {
+        document.title = cached.S.brand;
+        document.getElementById('loader-brand').textContent = cached.S.brand;
+        window.__ybCachedSettings = cached;
+      }
+    } catch (e) {}
+  })();
+</script>
+
 <!-- MAINTENANCE PAGE -->
 <div id="maintenance-view">
   <div style="font-size:52px;margin-bottom:20px" id="maint-icon">🔧</div>
