@@ -273,11 +273,8 @@
           <div class="pay-method" onclick="selectPayMethod(this,'apple')"><span class="pm-icon">🍎</span>Apple Pay</div>
         </div>
         <div id="card-fields">
-          <div class="card-field"><span id="card-brand-icon">💳</span><input placeholder="Numéro de carte" id="card-num" oninput="detectCard(this)"></div>
-          <div class="form-row-2 gap8">
-            <div class="card-field"><input placeholder="MM / AA"></div>
-            <div class="card-field"><input placeholder="CVV" maxlength="4"></div>
-          </div>
+          <div class="card-field" id="stripe-card-element"><!-- Stripe monte ici son champ sécurisé --></div>
+          <p id="stripe-card-errors" class="stripe-card-errors"></p>
           <p class="stripe-note"><span class="lock-icon">🔒</span><span id="cart-stripe-lbl">Paiement sécurisé par Stripe. Tes données ne nous sont jamais transmises.</span></p>
         </div>
         <div id="other-pay-msg" style="display:none;" class="other-pay-msg">Tu seras redirigé vers le service sécurisé.</div>
@@ -299,7 +296,7 @@
         <div class="price-row" id="discount-row" style="display:none"><span class="lbl">Réduction</span><span class="val discount" id="summary-discount">—</span></div>
         <div class="divider"></div>
         <div class="price-row total"><span class="lbl" id="cart-total-lbl">Total</span><span class="val" id="summary-total">—</span></div>
-        <button class="btn-checkout" onclick="processCheckout()"><span id="cart-btn-txt">Payer maintenant →</span></button>
+        <button class="btn-checkout" id="checkout-btn" onclick="processCheckout()"><span id="cart-btn-txt">Payer maintenant →</span></button>
         <p class="checkout-sub" id="cart-checkout-sub">Paiement 100% sécurisé · Accès immédiat</p>
         <div class="guarantee-strip">🛡️ <span id="cart-guarantee-txt">Satisfait ou remboursé 365 jours, sans conditions.</span></div>
         <div class="mini-trust">
@@ -461,6 +458,7 @@
   </div>
 </div><!-- /admin -->
 
+<script src="https://js.stripe.com/v3/"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/data.js?v=13"></script>
 <script src="js/supabase.js?v=13"></script>
