@@ -266,52 +266,6 @@ textarea.fi { resize: vertical; min-height: 70px; }
 .mobile-nav { display: none; background: var(--card); border-bottom: 1px solid var(--border); padding: 12px 24px; flex-direction: column; gap: 8px; }
 .mobile-nav.open { display: flex; }
 .mobile-nav a { color: var(--muted); font-size: 14px; padding: 8px 0; border-bottom: 1px solid var(--border); cursor: pointer; }
-@media (max-width: 768px) {
-  .main-nav .nav-links { display: none; }
-  .mobile-menu-btn { display: block; }
-  #top-banner { padding: 8px 16px; font-size: 11px; }
-  .hero { padding: 60px 20px 40px; }
-  .hero-title { font-size: 32px !important; }
-  .packs-grid, .feat-grid, .rev-grid { grid-template-columns: 1fr; }
-  section { padding: 48px 20px; }
-  .cart-wrap { grid-template-columns: 1fr; padding: 20px 16px; }
-  .fr2 { grid-template-columns: 1fr; }
-
-  /* ── Header zone membre / admin (sub-nav) ── */
-  .sub-nav { padding: 0 14px; height: auto; min-height: 56px; flex-wrap: wrap; gap: 8px; padding-top: 10px; padding-bottom: 10px; }
-  .sub-nav .nav-logo { font-size: 16px; }
-  .sub-nav .nav-links { gap: 8px; }
-  .panel-badge { font-size: 10px; padding: 4px 8px; }
-  .btn-nav-ol.sm { font-size: 10px; padding: 5px 9px; }
-
-  /* ── Panel membre / admin : sidebar passe en barre horizontale ── */
-  .panel-layout { flex-direction: column; min-height: auto; }
-  .sidebar {
-    width: 100%; flex-shrink: 0; border-right: none; border-bottom: 1px solid var(--border);
-    display: flex; flex-direction: row; gap: 6px; overflow-x: auto;
-    padding: 10px 12px; -webkit-overflow-scrolling: touch;
-  }
-  .sidebar .sttl { display: none; }
-  .sidebar .sl { white-space: nowrap; flex-shrink: 0; margin-bottom: 0; }
-  .panel-main { padding: 16px; overflow-x: hidden; }
-  .ptitle { font-size: 18px; }
-
-  /* ── Tableaux admin : scroll horizontal contenu dans la carte ── */
-  .adsec { overflow-x: auto; }
-  table { min-width: 480px; }
-
-  /* ── Messagerie : empile la liste des conversations et le fil ── */
-  .msg-layout { grid-template-columns: 1fr; height: auto; }
-  .msg-sidebar { border-right: none; border-bottom: 1px solid var(--border); max-height: 220px; }
-
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 420px) {
-  .stats-row { grid-template-columns: 1fr 1fr; }
-  .panel-card, .legal-content { padding: 14px; }
-}
-
 /* ── HERO ── */
 .hero { position: relative; padding: 100px 40px 60px; text-align: center; overflow: hidden; }
 .hero-glow {
@@ -593,6 +547,7 @@ tr:hover td { background: rgba(255,255,255,0.01); }
 .unread-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--violet); flex-shrink: 0; }
 .msg-main { display: flex; flex-direction: column; overflow: hidden; }
 .msg-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.msg-back-btn { display: none; }
 .msg-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(236,72,153,0.2)); display: flex; align-items: center; justify-content: center; font-family: 'Raleway', sans-serif; font-weight: 700; font-size: 13px; flex-shrink: 0; }
 .msg-name { font-family: 'Raleway', sans-serif; font-weight: 700; font-size: 14px; }
 .msg-pack { font-size: 11px; color: var(--muted); }
@@ -641,3 +596,60 @@ tr:hover td { background: rgba(255,255,255,0.01); }
 .cfi.open .cfq { color: var(--vl); }
 .chat-contact { display: block; width: 100%; margin-top: 8px; padding: 9px; border-radius: 7px; background: linear-gradient(135deg, var(--violet), var(--rose)); border: none; color: #fff; font-family: 'Raleway', sans-serif; font-weight: 700; font-size: 11px; cursor: pointer; text-align: center; text-decoration: none; transition: opacity .2s; }
 .chat-contact:hover { opacity: .88; }
+
+/* ============================================================
+   RESPONSIVE — placé en fin de fichier pour primer sur les
+   règles de base à spécificité égale (ordre de cascade CSS)
+   ============================================================ */
+@media (max-width: 768px) {
+  .main-nav .nav-links { display: none; }
+  .mobile-menu-btn { display: block; }
+  #top-banner { padding: 8px 16px; font-size: 11px; }
+  .hero { padding: 60px 20px 40px; }
+  .hero-title { font-size: 32px !important; }
+  .packs-grid, .feat-grid, .rev-grid { grid-template-columns: 1fr; }
+  section { padding: 48px 20px; }
+  .cart-wrap { grid-template-columns: 1fr; padding: 20px 16px; gap: 16px; }
+  .fr2 { grid-template-columns: 1fr; }
+
+  /* ── Header zone membre / admin ── */
+  .sub-nav { padding: 10px 14px; height: auto; min-height: 56px; flex-wrap: wrap; gap: 8px; }
+  .sub-nav .nav-logo { font-size: 16px; }
+  .sub-nav .nav-links { gap: 8px; }
+  .panel-badge { font-size: 10px; padding: 4px 8px; }
+  .btn-nav-ol.sm { font-size: 10px; padding: 5px 9px; }
+
+  /* ── Panel membre / admin : sidebar passe en barre horizontale ── */
+  .panel-layout { flex-direction: column; min-height: auto; }
+  .sidebar {
+    width: 100%; flex-shrink: 0; border-right: none; border-bottom: 1px solid var(--border);
+    display: flex; flex-direction: row; gap: 6px; overflow-x: auto;
+    padding: 10px 12px; -webkit-overflow-scrolling: touch;
+  }
+  .sidebar .sttl { display: none; }
+  .sidebar .sl { white-space: nowrap; flex-shrink: 0; margin-bottom: 0; }
+  .panel-main { padding: 16px; overflow-x: hidden; }
+  .ptitle { font-size: 18px; }
+
+  /* ── Tableaux admin : scroll horizontal contenu dans la carte ── */
+  .adsec { overflow-x: auto; }
+  table { min-width: 480px; }
+
+  /* ── Messagerie : bascule liste ↔ conversation (comme une vraie app) ── */
+  .msg-layout {
+    grid-template-columns: 1fr; height: calc(100vh - 200px); min-height: 360px;
+    position: relative; overflow: hidden;
+  }
+  .msg-sidebar { border-right: none; width: 100%; }
+  .msg-main { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--card); }
+  .msg-layout:not(.show-chat) .msg-main { display: none; }
+  .msg-layout.show-chat .msg-sidebar { display: none; }
+  .msg-back-btn { display: inline-flex; align-items: center; gap: 4px; background: none; border: none; color: var(--vl); font-size: 12px; font-weight: 700; cursor: pointer; padding: 0 0 8px; }
+
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 420px) {
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .panel-card, .legal-content { padding: 14px; }
+}
