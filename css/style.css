@@ -274,8 +274,42 @@ textarea.fi { resize: vertical; min-height: 70px; }
   .hero-title { font-size: 32px !important; }
   .packs-grid, .feat-grid, .rev-grid { grid-template-columns: 1fr; }
   section { padding: 48px 20px; }
-  .cart-wrap { grid-template-columns: 1fr; }
+  .cart-wrap { grid-template-columns: 1fr; padding: 20px 16px; }
   .fr2 { grid-template-columns: 1fr; }
+
+  /* ── Header zone membre / admin (sub-nav) ── */
+  .sub-nav { padding: 0 14px; height: auto; min-height: 56px; flex-wrap: wrap; gap: 8px; padding-top: 10px; padding-bottom: 10px; }
+  .sub-nav .nav-logo { font-size: 16px; }
+  .sub-nav .nav-links { gap: 8px; }
+  .panel-badge { font-size: 10px; padding: 4px 8px; }
+  .btn-nav-ol.sm { font-size: 10px; padding: 5px 9px; }
+
+  /* ── Panel membre / admin : sidebar passe en barre horizontale ── */
+  .panel-layout { flex-direction: column; min-height: auto; }
+  .sidebar {
+    width: 100%; flex-shrink: 0; border-right: none; border-bottom: 1px solid var(--border);
+    display: flex; flex-direction: row; gap: 6px; overflow-x: auto;
+    padding: 10px 12px; -webkit-overflow-scrolling: touch;
+  }
+  .sidebar .sttl { display: none; }
+  .sidebar .sl { white-space: nowrap; flex-shrink: 0; margin-bottom: 0; }
+  .panel-main { padding: 16px; overflow-x: hidden; }
+  .ptitle { font-size: 18px; }
+
+  /* ── Tableaux admin : scroll horizontal contenu dans la carte ── */
+  .adsec { overflow-x: auto; }
+  table { min-width: 480px; }
+
+  /* ── Messagerie : empile la liste des conversations et le fil ── */
+  .msg-layout { grid-template-columns: 1fr; height: auto; }
+  .msg-sidebar { border-right: none; border-bottom: 1px solid var(--border); max-height: 220px; }
+
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 420px) {
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .panel-card, .legal-content { padding: 14px; }
 }
 
 /* ── HERO ── */
