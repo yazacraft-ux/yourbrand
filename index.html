@@ -51,14 +51,14 @@
       <div class="ltab" onclick="switchLTab('admin')">Admin</div>
     </div>
     <div class="lform active" id="lf-membre">
-      <input class="linput" type="email" placeholder="Email" id="m-email">
-      <input class="linput" type="password" placeholder="Mot de passe" id="m-pass">
+      <input class="linput" type="email" placeholder="Email" id="m-email" onkeydown="if(event.key==='Enter'){event.preventDefault();loginMembre();}">
+      <input class="linput" type="password" placeholder="Mot de passe" id="m-pass" onkeydown="if(event.key==='Enter'){event.preventDefault();loginMembre();}">
       <button class="btn-login" onclick="loginMembre()">Accéder à mon espace →</button>
       <p class="login-forgot">Mot de passe oublié ? <span onclick="handleForgotPassword()">Réinitialiser</span></p>
     </div>
     <div class="lform" id="lf-admin">
-      <input class="linput" type="email" placeholder="Email admin" id="a-email">
-      <input class="linput" type="password" placeholder="Mot de passe admin" id="a-pass">
+      <input class="linput" type="email" placeholder="Email admin" id="a-email" onkeydown="if(event.key==='Enter'){event.preventDefault();loginAdmin();}">
+      <input class="linput" type="password" placeholder="Mot de passe admin" id="a-pass" onkeydown="if(event.key==='Enter'){event.preventDefault();loginAdmin();}">
       <button class="btn-login" onclick="loginAdmin()">Panel admin →</button>
     </div>
   </div>
