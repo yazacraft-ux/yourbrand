@@ -417,7 +417,11 @@ footer { padding: 28px 40px; border-top: 1px solid var(--border); display: flex;
 .pay-method:hover { border-color: var(--bh); color: var(--text); }
 .pay-method.active { border-color: var(--violet); background: rgba(124,58,237,0.08); color: var(--vl); }
 .pm-icon { font-size: 16px; display: block; margin-bottom: 2px; }
-.card-field { background: #0A0A0C; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; gap: 7px; margin-bottom: 10px; }
+.card-field { background: #0A0A0C; border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 11px 12px; display: flex; align-items: center; gap: 7px; margin-bottom: 6px; transition: border-color .15s; }
+.card-field.StripeElement--focus { border-color: var(--vl); }
+.card-field.StripeElement--invalid { border-color: var(--red); }
+.stripe-card-errors { color: var(--red); font-size: 11px; min-height: 14px; margin-bottom: 8px; }
+#checkout-btn[disabled] { opacity: .6; cursor: not-allowed; }
 .card-field input { background: transparent; border: none; outline: none; color: var(--text); font-size: 12px; font-family: 'Inter', sans-serif; flex: 1; }
 .card-field input::placeholder { color: var(--muted2); }
 .stripe-note { color: var(--muted); font-size: 10px; margin-top: 7px; display: flex; align-items: center; gap: 4px; }
