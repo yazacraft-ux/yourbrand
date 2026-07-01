@@ -379,14 +379,9 @@
     </div>
     <div class="panel-main">
       <div id="mtab-downloads" class="ptab active">
-        <h2 class="ptitle">Mes téléchargements</h2>
-        <p class="psub">Tous tes achats disponibles ici</p>
-        <div class="panel-card">
-          <p class="card-title">📦 Pack Pro · Ebook + Bonus</p>
-          <p class="card-sub">Ton ebook est prêt. Télécharge-le sur n'importe quel appareil.</p>
-          <!-- 🔌 STRIPE + SUPABASE : remplace href par le vrai lien de téléchargement stocké en DB -->
-          <a href="#" class="dl-btn">⬇ Télécharger l'ebook</a>
-        </div>
+        <h2 class="ptitle" id="dl-page-title">Mes téléchargements</h2>
+        <p class="psub" id="dl-page-subtitle">Tous tes achats disponibles ici</p>
+        <div id="dl-cards-container"></div>
       </div>
       <div id="mtab-orders" class="ptab">
         <h2 class="ptitle">Mes commandes</h2>
@@ -450,6 +445,7 @@
       <div class="sl" onclick="setATab('redirect-admin',this)">↪️ Redirection</div>
       <div class="sl" onclick="setATab('textes',this)">✏️ Textes landing</div>
       <div class="sl" onclick="setATab('cart-texts',this)">🛒 Textes panier</div>
+      <div class="sl" onclick="setATab('downloads-admin',this)">📥 Téléchargements</div>
       <div class="sl" onclick="setATab('stats-admin',this)">📈 Chiffres clés</div>
       <div class="sl" onclick="setATab('exit-admin',this)">🚪 Pop-up sortie</div>
       <div class="sl" onclick="setATab('orderbump-admin',this)">➕ Order bump</div>
