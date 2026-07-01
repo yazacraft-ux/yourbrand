@@ -64,6 +64,21 @@
   </div>
 </div>
 
+<!-- Écran affiché après un lien d'invitation ou de réinitialisation : la personne DOIT
+     définir un mot de passe avant de pouvoir utiliser son compte. -->
+<div class="login-overlay" id="set-password-modal" style="display:none">
+  <div class="login-box">
+    <div class="login-logo" id="spw-brand">YourBrand</div>
+    <p class="login-sub-txt" id="spw-sub">Bienvenue ! Choisis ton mot de passe pour accéder à ton espace.</p>
+    <div class="lform active">
+      <input class="linput" type="password" placeholder="Mot de passe (min. 8 caractères)" id="spw-pass" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('spw-pass2').focus();}">
+      <input class="linput" type="password" placeholder="Confirme le mot de passe" id="spw-pass2" style="margin-top:10px" onkeydown="if(event.key==='Enter'){event.preventDefault();confirmSetPassword();}">
+      <p class="stripe-card-errors" id="spw-error" style="margin-top:8px"></p>
+      <button class="btn-login" style="margin-top:10px" onclick="confirmSetPassword()">Valider et accéder à mon espace →</button>
+    </div>
+  </div>
+</div>
+
 <!-- EXIT POPUP -->
 <div id="exit-popup">
   <div class="exit-box">
