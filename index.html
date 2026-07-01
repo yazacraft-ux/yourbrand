@@ -231,7 +231,7 @@
       <p class="cart-step" id="cart-step-lbl">Étape 1 sur 2</p>
       <h1 class="cart-title" id="cart-page-title">Finalise ta commande</h1>
 
-      <div class="cart-section">
+      <div class="cart-section" id="cart-info-section">
         <p class="cart-section-title"><span class="cs-num">1</span><span id="cart-info-title">Tes informations</span></p>
         <div class="form-row-2">
           <div class="form-row"><label class="fl">Prénom</label><input class="fi" placeholder="Alex" id="c-fname"></div>
@@ -257,7 +257,7 @@
         </div>
       </div>
 
-      <div class="cart-section">
+      <div class="cart-section" id="cart-coupon-section">
         <p class="cart-section-title"><span class="cs-num">2</span><span id="cart-coupon-title">Code promo</span></p>
         <div class="coupon-row">
           <input class="fi" placeholder="LANCEMENT50" id="coupon-input">
@@ -266,7 +266,7 @@
         <p class="coupon-ok" id="coupon-ok">✓ Code appliqué — <span id="coupon-discount-lbl">-50%</span> !</p>
       </div>
 
-      <div class="cart-section">
+      <div class="cart-section" id="cart-pay-section">
         <p class="cart-section-title"><span class="cs-num">3</span><span id="cart-pay-title">Méthode de paiement</span></p>
         <div class="pay-methods">
           <div class="pay-method active" onclick="selectPayMethod(this,'card')"><span class="pm-icon">💳</span>Carte</div>
@@ -432,6 +432,7 @@
       <p class="sttl">Admin</p>
       <div class="sl active" onclick="setATab('dashboard',this)">📊 Dashboard</div>
       <div class="sl" onclick="setATab('packs',this)">📦 Offres & prix</div>
+      <div class="sl" onclick="setATab('redirect-admin',this)">↪️ Redirection</div>
       <div class="sl" onclick="setATab('textes',this)">✏️ Textes landing</div>
       <div class="sl" onclick="setATab('cart-texts',this)">🛒 Textes panier</div>
       <div class="sl" onclick="setATab('stats-admin',this)">📈 Chiffres clés</div>
