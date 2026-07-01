@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YourBrand</title>
+<title>Jenafans</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css?v=13">
@@ -13,13 +13,13 @@
 <!-- LOADER INITIAL : masque le flash "landing → espace membre" et le flash du nom de marque
      pendant que la session et les réglages se chargent depuis Supabase -->
 <div id="app-loader">
-  <span id="loader-brand" class="grad">YourBrand</span>
+  <span id="loader-brand" class="grad">Jenafans</span>
   <span class="loader-dot"></span>
 </div>
 <script>
   // S'exécute en tout premier, avant tout le reste : applique immédiatement
   // le nom de marque mis en cache lors de la dernière visite, pour éviter
-  // tout flash du nom par défaut "YourBrand".
+  // tout flash du nom par défaut "Jenafans".
   (function () {
     try {
       var cached = JSON.parse(localStorage.getItem('yb_settings_cache') || 'null');
@@ -44,7 +44,7 @@
 <div class="login-overlay" id="login-modal">
   <div class="login-box">
     <button class="modal-x" onclick="closeLogin()">×</button>
-    <div class="login-logo" id="lm-brand">YourBrand</div>
+    <div class="login-logo" id="lm-brand">Jenafans</div>
     <p class="login-sub-txt">Connecte-toi à ton espace</p>
     <div class="login-tabs">
       <div class="ltab active" onclick="switchLTab('membre')">Mon espace</div>
@@ -68,7 +68,7 @@
      définir un mot de passe avant de pouvoir utiliser son compte. -->
 <div class="login-overlay" id="set-password-modal" style="display:none">
   <div class="login-box">
-    <div class="login-logo" id="spw-brand">YourBrand</div>
+    <div class="login-logo" id="spw-brand">Jenafans</div>
     <p class="login-sub-txt" id="spw-sub">Bienvenue ! Choisis ton mot de passe pour accéder à ton espace.</p>
     <div class="lform active">
       <input class="linput" type="password" placeholder="Mot de passe (min. 8 caractères)" id="spw-pass" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('spw-pass2').focus();}">
@@ -144,7 +144,7 @@
   </div>
 
   <nav class="main-nav">
-    <span class="nav-logo" id="nav-brand" onclick="showView('landing')">YourBrand</span>
+    <span class="nav-logo" id="nav-brand" onclick="showView('landing')">Jenafans</span>
     <div class="nav-links">
       <a onclick="scrollToId('packs')">Offres</a>
       <a onclick="scrollToId('features')">Contenu</a>
@@ -225,7 +225,7 @@
   </div>
 
   <footer>
-    <span class="fcopy" id="footer-copy">© 2025 YourBrand · Tous droits réservés</span>
+    <span class="fcopy" id="footer-copy">© 2025 Jenafans · Tous droits réservés</span>
     <div class="flinks">
       <a onclick="showView('mentions')">Mentions légales</a>
       <a onclick="showView('cgv')">CGV</a>
@@ -237,7 +237,7 @@
 <!-- ===== CART ===== -->
 <div id="cart" class="view">
   <nav class="sub-nav">
-    <span class="nav-logo" onclick="showView('landing')">← <span id="cart-brand">YourBrand</span></span>
+    <span class="nav-logo" onclick="showView('landing')">← <span id="cart-brand">Jenafans</span></span>
     <span class="secure-badge">Paiement sécurisé 🔒</span>
   </nav>
   <div class="cart-wrap">
@@ -327,7 +327,7 @@
 
 <!-- ===== SUCCESS ===== -->
 <div id="success" class="view">
-  <nav class="sub-nav"><span class="nav-logo" onclick="showView('landing')">YourBrand</span></nav>
+  <nav class="sub-nav"><span class="nav-logo" onclick="showView('landing')">Jenafans</span></nav>
   <div class="success-page">
     <div class="success-box">
       <div class="success-icon">✅</div>
@@ -342,7 +342,7 @@
 <!-- ===== MENTIONS LÉGALES ===== -->
 <div id="mentions" class="view legal-page">
   <nav class="sub-nav">
-    <span class="nav-logo" onclick="showView('landing')">← <span class="nb">YourBrand</span></span>
+    <span class="nav-logo" onclick="showView('landing')">← <span class="nb">Jenafans</span></span>
     <a class="nav-link-sm" onclick="showView('cgv')">CGV →</a>
   </nav>
   <div class="legal-content" id="mentions-content"></div>
@@ -351,7 +351,7 @@
 <!-- ===== CGV ===== -->
 <div id="cgv" class="view legal-page">
   <nav class="sub-nav">
-    <span class="nav-logo" onclick="showView('landing')">← <span class="nb">YourBrand</span></span>
+    <span class="nav-logo" onclick="showView('landing')">← <span class="nb">Jenafans</span></span>
     <a class="nav-link-sm" onclick="showView('mentions')">Mentions légales →</a>
   </nav>
   <div class="legal-content" id="cgv-content"></div>
@@ -360,7 +360,7 @@
 <!-- ===== ESPACE MEMBRE ===== -->
 <div id="membre" class="view panel-view">
   <nav class="sub-nav">
-    <span class="nav-logo" onclick="showView('landing')">← <span class="nb">YourBrand</span></span>
+    <span class="nav-logo" onclick="showView('landing')">← <span class="nb">Jenafans</span></span>
     <div class="nav-links">
       <span class="panel-badge">Mon espace</span>
       <button class="btn-nav-ol sm" onclick="logoutUser()">Déconnexion</button>
@@ -436,7 +436,7 @@
 <!-- ===== ADMIN ===== -->
 <div id="admin" class="view panel-view">
   <nav class="sub-nav">
-    <span class="nav-logo" onclick="showView('landing')">← <span class="nb">YourBrand</span></span>
+    <span class="nav-logo" onclick="showView('landing')">← <span class="nb">Jenafans</span></span>
     <div class="nav-links">
       <span class="panel-badge admin-badge">Panel Admin</span>
       <button class="btn-nav-ol sm" onclick="logoutUser()">Déconnexion</button>
