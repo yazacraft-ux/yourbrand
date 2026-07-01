@@ -677,3 +677,13 @@ tr:hover td { background: rgba(255,255,255,0.01); }
   opacity: .45; padding: 2px 4px; border-radius: 4px; transition: opacity .15s, background .15s;
 }
 .msg-thread-del:hover { opacity: 1; background: rgba(239,68,68,0.15); }
+
+/* ── Encart d'info en haut du panier (ex: compte Instagram public) ── */
+.cart-notice {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: linear-gradient(135deg, rgba(124,58,237,0.14), rgba(236,72,153,0.10));
+  border: 1px solid rgba(124,58,237,0.35);
+  border-radius: 10px; padding: 13px 15px; margin-bottom: 18px;
+  font-size: 13px; line-height: 1.5; color: var(--text);
+}
+.cart-notice span:first-child { font-size: 17px; flex-shrink: 0; line-height: 1.3; }
